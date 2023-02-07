@@ -83,8 +83,6 @@ def showCommand(event,lineMessage):
     test = getAttendanceData(studentID,studentPass)
     sendMessageToLine(event,studentID + studentPass + test)
 
-
-
 def lambda_handler(event, context):
     lineMessage = json.loads(event['body'])['events'][0]['message']['text']
     if re.fullmatch(r'show::\d{9}::.+', lineMessage):
@@ -92,8 +90,8 @@ def lambda_handler(event, context):
     elif re.fullmatch(r'set::\d{9}::.+', lineMessage):
         lineID = json.loads(event['body'])['events'][0]['source']['userId']
         print("dynamodbにLineIDと学籍番号、パスワードを保存")
-    else:
-        print("エラー返す")
+    else:#エラー
+        sendMessageToLine(event,"存在しないコマンドです。")
     
     return 
 
