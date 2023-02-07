@@ -88,7 +88,15 @@ def lambda_handler(event, context):
     if re.fullmatch(r'show::\d{9}::.+', lineMessage):
         showCommand(event,lineMessage)
     elif re.fullmatch(r'set::\d{9}::.+', lineMessage):
-        lineID = json.loads(event['body'])['events'][0]['source']['userId']
+        try:
+            lineID = json.loads(event['body'])['events'][0]['source']['userId']
+        except:
+            sendMessageToLine(event,"エラー：lineIDが取得できませんでした。")
+            exit(1)
+        if lineID == "":
+            sendMessageToLine(event,"エラー：lineIDが取得できませんでした。")
+            exit(1)
+        sendMessageToLine(event,"dynamodbにLineIDと学籍番号、パスワードを保存")
         print("dynamodbにLineIDと学籍番号、パスワードを保存")
     else:#エラー
         sendMessageToLine(event,"存在しないコマンドです。")
@@ -104,3 +112,5 @@ def lambda_handler(event, context):
 # - #カードリーダーじゃない授業の登録
 # -- #eventbridge とかを使って定期実行するようにする。ー登録した授業の時間に確認してくれる質問を配信する。
 # - dynamodbに質問の回答を記録する
+
+#エラー処理が全体的に必要
