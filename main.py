@@ -6,8 +6,14 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome import service
 import re
+import boto3
 
 LINE_CHANNEL_ACCESS_TOKEN = '2M07AZXtvOywMJmsEQDoHfJymesBFqnt6ERnHzCW41F2vp/Aj4A6YP26vEEhiMGUd0s31BttYvrUi+iaGyXYAyW2ojy0ilDZS13Rbbi0jXYW4EO3k9W94UoBIgjV4N7yhVxhQgRflEWiZuC1NVJCXQdB04t89/1O/w1cDnyilFU='
+TABLE_NAME = "linebot-test"
+TABLE_COLUMN_1 = "line-id"
+TABLE_COLUMN_2 = "student-id"
+TABLE_COLUMN_3 = "student-pass"
+dynamodb = boto3.resource('dynamodb')
 
 def getAttendanceData(studentID,studentPass):
     options = webdriver.ChromeOptions()
@@ -83,26 +89,41 @@ def showCommand(event,lineMessage):
     test = getAttendanceData(studentID,studentPass)
     sendMessageToLine(event,studentID + studentPass + test)
 
+def setCommand(event,lineMessage):
+    try: #userIDは常にあるのかわからないので配列からデータをとるときLineIDが空白の時で二重でエラーチェックしてる。片方で良ければ片方消す
+        lineID = json.loads(event['body'])['events'][0]['source']['userId']
+    except:
+        sendMessageToLine(event,"エラー：lineIDが取得できませんでした。")
+        exit(1)
+    if lineID == "":
+        sendMessageToLine(event,"エラー：lineIDが取得できませんでした。")
+        exit(1)
+    messageList = re.findall(r'[^::]+', lineMessage)
+    studentID = messageList[1]
+    studentPass = messageList[2]
+    table = dynamodb.Table(TABLE_NAME)
+    table.put_item(
+        Item={
+            TABLE_COLUMN_1:lineID,
+            TABLE_COLUMN_2:studentID,
+            TABLE_COLUMN_3:studentPass
+        }
+    )
+    return
+
 def lambda_handler(event, context):
     lineMessage = json.loads(event['body'])['events'][0]['message']['text']
     if re.fullmatch(r'show::\d{9}::.+', lineMessage):
         showCommand(event,lineMessage)
     elif re.fullmatch(r'set::\d{9}::.+', lineMessage):
-        try:
-            lineID = json.loads(event['body'])['events'][0]['source']['userId']
-        except:
-            sendMessageToLine(event,"エラー：lineIDが取得できませんでした。")
-            exit(1)
-        if lineID == "":
-            sendMessageToLine(event,"エラー：lineIDが取得できませんでした。")
-            exit(1)
+        setCommand(event,lineMessage)
         sendMessageToLine(event,"dynamodbにLineIDと学籍番号、パスワードを保存")
-        print("dynamodbにLineIDと学籍番号、パスワードを保存")
     else:#エラー
         sendMessageToLine(event,"存在しないコマンドです。")
     
     return 
-
+#lineに返信できるのは１メッセージにつき５メッセージまで
+# -- 'replyToken': message_event['replyToken'],が１つにつき５回までしか使えない
 #dynamodb に lineid id pass 一緒に保存するコマンドを作る
 #eventbridge とかを使って定期実行するようにする。
 #linebotにリッチメニューをつくる
