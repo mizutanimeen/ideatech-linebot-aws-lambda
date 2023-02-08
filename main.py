@@ -8,7 +8,7 @@ from selenium.webdriver.chrome import service
 import re
 import boto3
 
-LINE_CHANNEL_ACCESS_TOKEN = '2M07AZXtvOywMJmsEQDoHfJymesBFqnt6ERnHzCW41F2vp/Aj4A6YP26vEEhiMGUd0s31BttYvrUi+iaGyXYAyW2ojy0ilDZS13Rbbi0jXYW4EO3k9W94UoBIgjV4N7yhVxhQgRflEWiZuC1NVJCXQdB04t89/1O/w1cDnyilFU='
+LINE_CHANNEL_ACCESS_TOKEN = 
 TABLE_NAME = "linebot-test"
 TABLE_COLUMN_1 = "line-id"
 TABLE_COLUMN_2 = "student-id"
