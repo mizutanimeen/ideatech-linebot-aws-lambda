@@ -24,3 +24,4 @@ def PutDataIntoIDTable(lineID,studentID,studentPass):
             ID_TABLE_COLUMN_3:studentPass
         }
     )
+    return
