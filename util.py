@@ -1,8 +1,7 @@
 import re
 import json
 import urllib.request
-
-LINE_CHANNEL_ACCESS_TOKEN = 
+import os
 
 def GetLineIDByMessage(event):
     try: #userIDは常にあるのかわからないので配列からデータをとるときuserIDの配列自体存在しているか、LineIDが空白の時で二重でエラーチェックしてる。片方で良ければ片方消す
@@ -27,7 +26,7 @@ def SendMessageToLine(event,aMessage):
         url = 'https://api.line.me/v2/bot/message/reply'
         headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + LINE_CHANNEL_ACCESS_TOKEN
+            'Authorization': 'Bearer ' + os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
         }
         body = {
             'replyToken': message_event['replyToken'],

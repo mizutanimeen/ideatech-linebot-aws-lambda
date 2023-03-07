@@ -2,6 +2,7 @@ import json
 import urllib.request
 import os
 import boto3
+#lambdaにLINE_CHANNEL_ACCESS_TOKENで環境変数を追加が必要
 
 ID_TABLE_NAME = "linebot-test"
 ID_TABLE_COLUMN_1 = "line-id"
@@ -16,7 +17,6 @@ def lambda_handler(event, context):
         url = 'https://api.line.me/v2/bot/message/push'
         headers = {
             'Content-Type': 'application/json',
-            #lambdaにLINE_CHANNEL_ACCESS_TOKENで環境変数を追加が必要
             'Authorization': 'Bearer ' + os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
         }
         body = {

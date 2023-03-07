@@ -44,18 +44,34 @@ def getAttendData(studentID,studentPass):
         attend1 = driver.find_elements(By.XPATH,'//div[@id="sideMenuMiddle"]/ul/li[@class="item"]/a')
         attend1[0].click()
         
-        rate = driver.find_elements(By.XPATH,'//table[@style="margin-top:-40px"]/tbody/tr/td/div/table[@class="ssekitable"]/tbody/tr/td[@class="item"]')
-        
-        test = ""
+        tMsg = ""
 
-        for s in rate:
-            subject = s.text
-            if subject!="未" and subject!="-" and subject!="出" and subject!="欠"and subject!="遅" and subject!="":
-                print(subject)
-                test += subject + "\n"
+        tGradeTables = driver.find_elements(By.CLASS_NAME,'ssekitable')
+        for tTable in tGradeTables:
+            tDayOfWeek = tTable.find_element(By.XPATH,".//tbody/tr/th")
+            tMsg += f"-----{tDayOfWeek.text}-----\n" #曜日
+            tLessons = tTable.find_elements(By.XPATH,".//tbody/tr")
+            for i in range(len(tLessons)):
+                if i < 3:
+                    continue
+                tItems = tLessons[i].find_elements(By.CLASS_NAME,"item")
+                for j in range(len(tItems)):
+                    if j == 0:
+                        tMsg += f"{tItems[j].text}: "
+                    elif j == 1:
+                        tMsg += f"{tItems[j].text}\n"
+                    elif j == 2:
+                        tMsg += f"講義回数: {tItems[j].text}\n"
+                    elif j == 3:
+                        tMsg += f"出席回数: {tItems[j].text}\n"
+                    elif j == 4:
+                        tMsg += f"出席率: {tItems[j].text}\n"
+                        tMsg += "-----------\n"
+                    else:
+                        break
     except:
         return "データが取得できませんでした。" # エラー文増やす。ログインできたか、運用時間外か、などでtry小分けする
-    return test
+    return tMsg
 
 def ShowCommand(event,lineMessage):
     if re.fullmatch(r'show', lineMessage):#データベースからデータを取ってきて出席データを返す
