@@ -28,7 +28,7 @@ def getAttendData(studentID,studentPass):
         gakuseki_box.send_keys(studentID)
         pass_box = driver.find_element(By.NAME,"callback_1")
         pass_box.send_keys(studentPass)
-        login = driver.find_element(By.NAME,"callback_2")
+        login = driver.find_element(By.NAME,"callback_4")
         login.click()
 
         gakumu = driver.find_elements(By.XPATH,'//nav[@class="templatemo-left-nav sp-none"]/ul/li/a')
